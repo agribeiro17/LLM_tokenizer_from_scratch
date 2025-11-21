@@ -51,3 +51,34 @@ The notebook is structured in the following steps:
 ## Future Directions
 
 The notebook concludes with a discussion of other special tokens used in LLMs, such as `[BOS]`, `[EOS]`, and `[PAD]`, and mentions that more advanced tokenizers like Byte Pair Encoding (BPE) are used in models like GPT to handle the out-of-vocabulary problem more effectively by breaking words into subword units.
+
+## Byte Pair Encoding (BPE)
+
+The notebook also introduces Byte Pair Encoding (BPE), a more advanced tokenization technique used in models like GPT. BPE is a subword-based tokenization algorithm that iteratively merges the most frequent pair of bytes in the vocabulary. This allows the tokenizer to handle any word, including unknown words, by breaking them down into smaller, known subword units.
+
+### Using `tiktoken` for BPE
+
+The `tiktoken` library from OpenAI is used to demonstrate BPE in practice. It provides a simple way to use the same tokenizer as GPT models.
+
+**Installation:**
+```bash
+pip3 install tiktoken
+```
+
+**Encoding and Decoding with `tiktoken`:**
+```python
+import tiktoken
+
+tokenizer = tiktoken.get_encoding("gpt2")
+
+text = ("Hello, do you like tea? <|endoftext|> In the sunlit terraces"
+        "of someunkownPlace.")
+
+integers = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
+print(integers)
+
+strings = tokenizer.decode(integers)
+print(strings)
+```
+
+This demonstrates how BPE can encode and decode text, including out-of-vocabulary words like "someunkownPlace", without needing an `<|unk|>` token. The word is simply broken down into subword units that are in the vocabulary.
