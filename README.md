@@ -82,3 +82,74 @@ print(strings)
 ```
 
 This demonstrates how BPE can encode and decode text, including out-of-vocabulary words like "someunkownPlace", without needing an `<|unk|>` token. The word is simply broken down into subword units that are in the vocabulary.
+
+## Creating Input-Target Pairs for Language Modeling
+
+After tokenizing the text, the next step is to prepare the data for training a language model. This involves creating input-target pairs. For a next-word prediction task, the input is a sequence of tokens, and the target is the next token in the sequence.
+
+The notebook demonstrates a sliding window approach to generate these pairs from the tokenized text. For a given `context_size`, the input `x` is a sequence of tokens of that length, and the target `y` is the sequence shifted by one position.
+
+```python
+context_size = 4
+
+x = enc_sample[:context_size]
+y = enc_sample[1:context_size + 1]
+
+print(f"x: {x}")
+print(f"y: {y}")
+```
+
+## Data Loading with PyTorch
+
+To efficiently load the data in batches for training, the notebook uses PyTorch's `Dataset` and `DataLoader` classes.
+
+### `GPTDatasetV1`
+
+A custom `GPTDatasetV1` class is implemented, which inherits from `torch.utils.data.Dataset`. This class:
+- Takes the tokenized text, a tokenizer, a `max_length` (context size), and a `stride` as input.
+- Uses a sliding window to create chunks of `max_length` from the text.
+- For each chunk, it creates an `input_chunk` and a `target_chunk` (shifted by one).
+- These chunks are stored as PyTorch tensors.
+
+```python
+from torch.utils.data import Dataset, DataLoader
+
+class GPTDatasetV1(Dataset):
+    def __init__(self, txt, tokenizer, max_length, stride):
+        self.input_ids = []
+        self.target_ids = []
+
+        token_ids = tokenizer.encode(txt, allowed_special={"<|endoftext|>"})
+
+        for i in range(0, len(token_ids) - max_length, stride):
+            input_chunk = token_ids[i:i + max_length]
+            target_chunk = token_ids[i+1:i+max_length+1]
+            self.input_ids.append(torch.tensor(input_chunk))
+            self.target_ids.append(torch.tensor(target_chunk))
+
+    def __len__(self):
+        return len(self.input_ids)
+
+    def __getitem__(self, idx):
+        return self.input_ids[idx], self.target_ids[idx]
+```
+
+### `create_dataloader_v1`
+
+A helper function `create_dataloader_v1` is created to instantiate the `GPTDatasetV1` and wrap it in a `DataLoader`. The `DataLoader` provides an iterator for easy batching, shuffling, and parallel data loading.
+
+```python
+def create_dataloader_v1(txt, batch_size=4, max_length=256, stride=128, shuffle=True, drop_last=True, num_workers=0):
+    tokenizer = tiktoken.get_encoding("gpt2")
+    dataset = GPTDatasetV1(txt, tokenizer, max_length, stride)
+    dataloader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        drop_last=drop_last,
+        num_workers=num_workers
+    )
+    return dataloader
+```
+
+This setup allows for efficient training of a language model by providing a stream of input-target batches.
