@@ -82,6 +82,16 @@ The `Vector_Embedding.ipynb` notebook demonstrates the power of word embeddings 
 
 This notebook provides a clear, practical look at how word embeddings work and how they can be used to understand the relationships between words.
 
+## Positional Embeddings
+
+In addition to token embeddings, which capture the semantic meaning of words, transformer-based models like GPT require a way to understand the order of words in a sequence. This is achieved through **positional embeddings**. Since the self-attention mechanism in transformers processes all tokens in parallel, it has no inherent sense of sequence order. Positional embeddings provide this crucial context by adding a vector to each token embedding that represents its position in the input sequence.
+
+The `LLMTokenizer.ipynb` notebook demonstrates this concept by:
+
+*   **Creating a Positional Embedding Layer:** A new `torch.nn.Embedding` layer is created specifically for positional embeddings. Its size is determined by the `context_length` (the maximum length of an input sequence) and the `output_dim` (the embedding dimension, which matches the token embedding dimension).
+*   **Generating Positional Embeddings:** A sequence of numbers from `0` to `context_length - 1` is created using `torch.arange(context_length)`. This sequence is then passed to the positional embedding layer to get the corresponding positional embedding vectors.
+*   **Combining with Token Embeddings:** The resulting positional embeddings are added directly to the token embeddings. PyTorch's broadcasting capabilities ensure that the positional embedding tensor is added to each sequence in the batch, resulting in a final input embedding tensor that contains both semantic and positional information. This combined embedding is then ready to be processed by the main LLM modules.
+
 ## Future Directions
 
 The notebook concludes with a discussion of other special tokens used in LLMs, suchs as `[BOS]`, `[EOS]`, and `[PAD]`, and mentions that more advanced tokenizers like Byte Pair Encoding (BPE) are used in models like GPT to handle the out-of-vocabulary problem more effectively by breaking words into subword units.
