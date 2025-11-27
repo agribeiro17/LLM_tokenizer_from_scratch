@@ -92,6 +92,18 @@ The `LLMTokenizer.ipynb` notebook demonstrates this concept by:
 *   **Generating Positional Embeddings:** A sequence of numbers from `0` to `context_length - 1` is created using `torch.arange(context_length)`. This sequence is then passed to the positional embedding layer to get the corresponding positional embedding vectors.
 *   **Combining with Token Embeddings:** The resulting positional embeddings are added directly to the token embeddings. PyTorch's broadcasting capabilities ensure that the positional embedding tensor is added to each sequence in the batch, resulting in a final input embedding tensor that contains both semantic and positional information. This combined embedding is then ready to be processed by the main LLM modules.
 
+## Simplified Attention Mechanism
+
+Attention mechanisms are a fundamental component of modern transformer-based models, enabling them to dynamically weigh the importance of different words within a sequence when processing a particular word. The `LLMTokenizer.ipynb` notebook provides a practical, code-free summary of a simplified attention mechanism without trainable weights.
+
+The process is demonstrated as follows:
+
+*   **Input Embeddings:** The process begins with a sequence of input embeddings, where each vector represents a word in the input text.
+*   **Query-Key Dot Product:** To determine how much attention a specific word (the "query") should pay to other words in the sequence (the "keys"), the dot product is calculated between the query's embedding and the embedding of every other word (including itself). This results in a set of attention scores.
+*   **Normalization with Softmax:** These raw attention scores are then normalized using the softmax function. This converts the scores into a set of positive attention weights that sum to 1. Each weight represents the relative importance of a word in the sequence with respect to the query word.
+
+This simplified example illustrates the core idea behind self-attention: for each word, the model learns to assign attention weights to all other words in the sequence, allowing it to build context-rich representations. The notebook provides a hands-on demonstration of these calculations.
+
 ## Future Directions
 
 The notebook concludes with a discussion of other special tokens used in LLMs, suchs as `[BOS]`, `[EOS]`, and `[PAD]`, and mentions that more advanced tokenizers like Byte Pair Encoding (BPE) are used in models like GPT to handle the out-of-vocabulary problem more effectively by breaking words into subword units.
