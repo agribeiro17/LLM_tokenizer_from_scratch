@@ -104,6 +104,24 @@ The process is demonstrated as follows:
 
 This simplified example illustrates the core idea behind self-attention: for each word, the model learns to assign attention weights to all other words in the sequence, allowing it to build context-rich representations. The notebook provides a hands-on demonstration of these calculations.
 
+## Self-Attention with Query, Key, and Value
+
+Building upon the simplified attention mechanism, full self-attention in transformer models introduces the concepts of Query (Q), Key (K), and Value (V) vectors. Instead of directly using the input embeddings for dot products, each input embedding is transformed into three distinct vectors:
+
+*   **Query (Q):** Represents what the current token is "looking for" in other tokens.
+*   **Key (K):** Represents what each token "offers" to other tokens.
+*   **Value (V):** Contains the actual information from each token that will be aggregated based on attention weights.
+
+The self-attention process then involves:
+
+1.  **Generating Q, K, V:** Each input token embedding is multiplied by three different weight matrices (learned during training) to produce its corresponding Q, K, and V vectors.
+2.  **Calculating Attention Scores:** For each Query vector, its dot product is computed with all Key vectors. This measures the compatibility or relevance between the Query token and every other token.
+3.  **Scaling:** The attention scores are typically scaled down by the square root of the dimension of the Key vectors to prevent the dot products from becoming too large, which can push the softmax function into regions with very small gradients.
+4.  **Softmax Normalization:** The scaled attention scores are then passed through a softmax function to obtain attention weights. These weights indicate how much focus each token should place on every other token in the sequence.
+5.  **Weighted Sum of Values:** Finally, the attention weights are multiplied by their corresponding Value vectors, and these weighted Value vectors are summed up. This produces the output for the Query token, which is a rich representation that incorporates information from all other tokens, weighted by their relevance.
+
+This QKV mechanism allows the model to learn complex relationships and dependencies between tokens in a sequence, forming the core of the transformer's ability to process sequential data effectively.
+
 ## Future Directions
 
 The notebook concludes with a discussion of other special tokens used in LLMs, suchs as `[BOS]`, `[EOS]`, and `[PAD]`, and mentions that more advanced tokenizers like Byte Pair Encoding (BPE) are used in models like GPT to handle the out-of-vocabulary problem more effectively by breaking words into subword units.
