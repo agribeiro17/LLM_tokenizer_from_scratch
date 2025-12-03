@@ -122,6 +122,12 @@ The self-attention process then involves:
 
 This QKV mechanism allows the model to learn complex relationships and dependencies between tokens in a sequence, forming the core of the transformer's ability to process sequential data effectively.
 
+## Causal Attention
+
+A key aspect of a large language model is that it is autoregressive, meaning it generates text one token at a time, and each new token prediction depends on the previously generated tokens. To enforce this behavior during training, a **causal attention** mechanism is used. This ensures that when calculating the attention scores for a given token, the model can only attend to tokens that appear earlier in the sequence and not to any "future" tokens.
+
+This is implemented by applying a **mask** to the attention scores before the softmax normalization step. The mask is typically a lower-triangular matrix where the values above the main diagonal are set to negative infinity. When the softmax function is applied, these large negative values become zero, effectively preventing the model from "peeking ahead" at subsequent tokens in the input sequence. This ensures that the prediction for a token at position `i` only depends on the known outputs at positions less than `i`, which is essential for causal language modeling.
+
 ## Future Directions
 
 The notebook concludes with a discussion of other special tokens used in LLMs, suchs as `[BOS]`, `[EOS]`, and `[PAD]`, and mentions that more advanced tokenizers like Byte Pair Encoding (BPE) are used in models like GPT to handle the out-of-vocabulary problem more effectively by breaking words into subword units.
